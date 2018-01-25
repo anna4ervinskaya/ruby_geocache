@@ -1,0 +1,11 @@
+I"ã(function() {
+  App.geo = App.cable.subscriptions.create("GeoChannel", {
+    connected: function() {},
+    disconnected: function() {},
+    received: function(data) {
+      return console.log(data);
+    }
+  });
+
+}).call(this);
+:ET

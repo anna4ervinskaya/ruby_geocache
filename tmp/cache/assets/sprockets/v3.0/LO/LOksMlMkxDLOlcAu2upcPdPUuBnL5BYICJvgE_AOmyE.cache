@@ -1,0 +1,20 @@
+I"Ä(function() {
+  App.geo = App.cable.subscriptions.create("GeoChannel", {
+    connected: function() {},
+    disconnected: function() {},
+    received: function(data) {
+      var i, results;
+      console.log(data);
+      if (data.list) {
+        window.geo.init();
+        results = [];
+        for (i in data.list) {
+          results.push(window.geo.add(i.lat, i.lng, i.message));
+        }
+        return results;
+      }
+    }
+  });
+
+}).call(this);
+:ET

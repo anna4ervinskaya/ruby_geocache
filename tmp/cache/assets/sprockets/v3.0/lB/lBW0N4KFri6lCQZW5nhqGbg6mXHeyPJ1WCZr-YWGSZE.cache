@@ -1,0 +1,23 @@
+I"J(function() {
+  App.geo = App.cable.subscriptions.create("GeoChannel", {
+    connected: function() {},
+    disconnected: function() {},
+    received: function(data) {
+      var i;
+      if (data.list) {
+        window.geo.init();
+        for (i in data.list) {
+          window.geo.add(data.list[i].lat, data.list[i].lng, data.list[i].message);
+        }
+      }
+      if (data.closest) {
+        alert("Closest message is " + data.closest);
+      }
+      if (data.in_radius) {
+        return alert("Messages in radius 100 km is " + data.in_radius);
+      }
+    }
+  });
+
+}).call(this);
+:ET

@@ -1,0 +1,59 @@
+I"h(function() {
+  var Geolocate;
+
+  Geolocate = function() {
+    var add_point, initMap, map, placeMarkerAndPanTo;
+    map = {};
+    add_point = function(lat, lng, message) {
+      var data;
+      data = {
+        message: message,
+        lat: lat,
+        lng: lng
+      };
+      if (App.geo.send(data)) {
+        placeMarkerAndPanTo(lat, lng, message);
+        return true;
+      }
+      return false;
+    };
+    initMap = function() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: -34.397,
+          lng: 150.644
+        },
+        zoom: 8
+      });
+      return map.addListener('click', function(e) {
+        var message;
+        message = window.prompt('Please enter your message', '');
+        if (message) {
+          return add_point(e.latLng.lat(), e.latLng.lng(), message);
+        }
+      });
+    };
+    placeMarkerAndPanTo = function(lat, lng, message) {
+      var latLng, marker;
+      latLng = new google.maps.LatLng(lat, lng);
+      marker = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        title: message
+      });
+      markers.push(marker);
+      map.panTo(latLng);
+    };
+    return {
+      init: initMap,
+      send: add_point,
+      add: placeMarkerAndPanTo
+    };
+  };
+
+  $(document).on('turbolinks:load', function() {
+    return window.geo = new Geolocate();
+  });
+
+}).call(this);
+:ET

@@ -1,0 +1,48 @@
+I"(function() {
+  var Geolocate;
+
+  Geolocate = function() {
+    var add_point, initMap;
+    add_point = function(lat, lng, message) {
+      var data;
+      data = {
+        message: message,
+        lat: lat,
+        lng: lng
+      };
+      if (App.geo.send(data)) {
+        placeMarkerAndPanTo(e.latLng, map, message);
+        return true;
+      }
+      return false;
+    };
+    initMap = function() {
+      var map;
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: -34.397,
+          lng: 150.644
+        },
+        zoom: 8
+      });
+      return map.addListener('click', function(e) {
+        var message;
+        message = window.prompt('Please enter your message', '');
+        if (message) {
+          return addPoint(e.latLng.lat(), e.latLng.lng(), message);
+        }
+      });
+    };
+    return {
+      init: initMap,
+      add: add_point
+    };
+  };
+
+  $(document).on('turbolinks:load', function() {
+    window.geo = new Geolocate();
+    return window.geo.init();
+  });
+
+}).call(this);
+:ET

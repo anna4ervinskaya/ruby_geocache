@@ -1,0 +1,25 @@
+I"±(function() {
+  App.geo = App.cable.subscriptions.create("GeoChannel", {
+    connected: function() {},
+    disconnected: function() {},
+    received: function(data) {
+      var i;
+      if (data.list) {
+        window.geo.init();
+        window.geo.markers = data.list;
+        for (i in data.list) {
+          window.geo.add_point(data.list[i].lat, data.list[i].lng, data.list[i].message, false);
+        }
+      }
+      if (data.closest) {
+        window.geo.draw_search_result([data.closest]);
+      }
+      if (data.in_radius && data.in_radius.length > 0) {
+        console.log(data);
+        return window.geo.draw_search_result([data.in_radius]);
+      }
+    }
+  });
+
+}).call(this);
+:ET

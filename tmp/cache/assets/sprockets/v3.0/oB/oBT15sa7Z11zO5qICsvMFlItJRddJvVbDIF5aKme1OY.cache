@@ -1,0 +1,85 @@
+I"(function() {
+  var Geolocate;
+
+  Geolocate = function() {
+    var add_point, initMap, map, placeMarkerAndPanTo;
+    map = {};
+    add_point = function(lat, lng, message) {
+      var data;
+      data = {
+        message: message,
+        lat: lat,
+        lng: lng
+      };
+      if (App.geo.send({
+        "new": data
+      })) {
+        placeMarkerAndPanTo(lat, lng, message);
+        return true;
+      }
+      return false;
+    };
+    initMap = function() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: -34.397,
+          lng: 150.644
+        },
+        zoom: 5
+      });
+      placeMarkerAndPanTo(-34.397, 150.644, "Start point");
+      map.addListener('click', function(e) {
+        var message;
+        message = window.prompt('Please enter your message', '');
+        if (message) {
+          return add_point(e.latLng.lat(), e.latLng.lng(), message);
+        }
+      });
+      return map.addListener('rightclick', function(e) {
+        return console.log(e.latLng);
+      });
+    };
+    placeMarkerAndPanTo = function(lat, lng, message) {
+      var latLng, marker;
+      latLng = new google.maps.LatLng(lat, lng);
+      marker = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        title: message,
+        label: message
+      });
+      map.panTo(latLng);
+    };
+    return {
+      init: initMap,
+      send: add_point,
+      add: placeMarkerAndPanTo
+    };
+  };
+
+  $(document).on('turbolinks:load', function() {
+    var data;
+    window.geo = new Geolocate();
+    data = {
+      lat: -34.397,
+      lng: 150.644
+    };
+    $('#closest_marker').bind('click', function() {
+      return console.log(App.geo.send({
+        find_close: data
+      }));
+    });
+    data = {
+      lat: -34.397,
+      lng: 150.644
+    };
+    return $('#find_markers_in_radius').bind('click', function() {
+      return console.log(App.geo.send({
+        find_in_radius: data
+      }));
+    });
+  });
+
+}).call(this);
+:ET

@@ -1,0 +1,37 @@
+I"](function() {
+  Geolocate(function() {
+    var add_point, init;
+    add_point = function(lat, lon, msg) {};
+    return init = function() {
+      var map;
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: -34.397,
+          lng: 150.644
+        },
+        zoom: 8
+      });
+      return map.addListener('click', function(e) {
+        var message;
+        message = window.prompt('Please enter your message', '');
+        if (message) {
+          if (App.geo.send({
+            message: message,
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng()
+          })) {
+            placeMarkerAndPanTo(e.latLng, map, message);
+          }
+        }
+      });
+    };
+  });
+
+  $(document).on('turbolinks:load', function() {
+    var geo;
+    geo = new Geolocate();
+    return geo.init();
+  });
+
+}).call(this);
+:ET

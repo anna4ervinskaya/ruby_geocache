@@ -1,0 +1,118 @@
+I"k(function() {
+  var Geolocate;
+
+  Geolocate = function() {
+    var add_point, draw_search_result, initMap, map, markers, placeMarkerAndPanTo, refresh_markers, start_marker, start_point;
+    map = {};
+    markers = [];
+    start_marker = null;
+    start_point = {
+      lat: -34.397,
+      lng: 150.644
+    };
+    add_point = function(lat, lng, message, save) {
+      var data;
+      if (save == null) {
+        save = true;
+      }
+      data = {
+        message: message,
+        lat: lat,
+        lng: lng
+      };
+      if (!save || App.geo.send({
+        "new": data
+      })) {
+        markers.push(placeMarkerAndPanTo(lat, lng, message));
+        return true;
+      }
+      return false;
+    };
+    refresh_markers = function() {
+      var i, j, len, results;
+      results = [];
+      for (j = 0, len = markers.length; j < len; j++) {
+        i = markers[j];
+        results.push(markers[i].setMap(map));
+      }
+      return results;
+    };
+    draw_search_result = function(show_markers) {
+      var i, j, len, results;
+      results = [];
+      for (j = 0, len = show_markers.length; j < len; j++) {
+        i = show_markers[j];
+        results.push(placeMarkerAndPanTo(show_markers[i].lat, show_markers[i].lng, show_markers[i].message, blue));
+      }
+      return results;
+    };
+    initMap = function() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: start_point.lat,
+          lng: start_point.lng
+        },
+        zoom: 5
+      });
+      start_marker = placeMarkerAndPanTo(start_point.lat, start_point.lng, "Start point", "green");
+      $('#search_lat').text(start_point.lat);
+      $('#search_lng').text(start_point.lng);
+      map.addListener('click', function(e) {
+        var message;
+        message = window.prompt('Please enter your message', '');
+        if (message) {
+          return add_point(e.latLng.lat(), e.latLng.lng(), message);
+        }
+      });
+      return map.addListener('rightclick', function(e) {
+        console.log(e.latLng);
+        refresh_markers();
+        start_marker.setMap(null);
+        start_marker = placeMarkerAndPanTo(e.latLng.lat(), e.latLng.lng(), "Start point", "green");
+        $('#search_lat').text(e.latLng.lat());
+        return $('#search_lng').text(e.latLng.lng());
+      });
+    };
+    placeMarkerAndPanTo = function(lat, lng, message, color) {
+      var latLng, marker;
+      if (color == null) {
+        color = "red";
+      }
+      latLng = new google.maps.LatLng(lat, lng);
+      marker = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        icon: 'http://maps.google.com/mapfiles/ms/icons/' + color + '-dot.png',
+        title: message,
+        label: message
+      });
+      map.panTo(latLng);
+      return marker;
+    };
+    return {
+      init: initMap,
+      add_point: add_point,
+      markers: markers,
+      draw_search_result: draw_search_result
+    };
+  };
+
+  $(document).on('turbolinks:load', function() {
+    window.geo = new Geolocate();
+    $('#closest_marker').bind('click', function() {
+      return console.log(App.geo.send({
+        find_close: window.geo.start_point
+      }));
+    });
+    $('#find_markers_in_radius').bind('click', function() {
+      return console.log(App.geo.send({
+        find_in_radius: window.geo.start_point
+      }));
+    });
+    return $('#show_all').bind('click', function() {
+      return console.log();
+    });
+  });
+
+}).call(this);
+:ET

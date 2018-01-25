@@ -1,0 +1,114 @@
+I"—(function() {
+  var Geolocate;
+
+  Geolocate = function() {
+    var add_point, draw_search_result, initMap, map, markers, placeMarkerAndPanTo, refresh_markers, start_marker, start_point;
+    map = {};
+    markers = [];
+    start_marker = null;
+    start_point = {
+      lat: -34.397,
+      lng: 150.644
+    };
+    add_point = function(lat, lng, message, save) {
+      var data;
+      if (save == null) {
+        save = true;
+      }
+      data = {
+        message: message,
+        lat: lat,
+        lng: lng
+      };
+      if (!save || App.geo.send({
+        "new": data
+      })) {
+        markers.push(placeMarkerAndPanTo(lat, lng, message));
+        return true;
+      }
+      return false;
+    };
+    refresh_markers = function() {
+      var i, len, m;
+      console.log(markers);
+      for (i = 0, len = markers.length; i < len; i++) {
+        m = markers[i];
+        m.setMap(map);
+      }
+      return true;
+    };
+    draw_search_result = function(show_markers) {
+      var i, len, m;
+      console.log(show_markers);
+      for (i = 0, len = show_markers.length; i < len; i++) {
+        m = show_markers[i];
+        placeMarkerAndPanTo(m.lat, m.lng, m.message, 'blue');
+      }
+      return true;
+    };
+    initMap = function() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: start_point.lat,
+          lng: start_point.lng
+        },
+        zoom: 5
+      });
+      start_marker = placeMarkerAndPanTo(start_point.lat, start_point.lng, "Start point", "green");
+      $('#search_lat').text(start_point.lat);
+      $('#search_lng').text(start_point.lng);
+      map.addListener('click', function(e) {
+        var message;
+        message = window.prompt('Please enter your message', '');
+        if (message) {
+          return add_point(e.latLng.lat(), e.latLng.lng(), message);
+        }
+      });
+      return map.addListener('rightclick', function(e) {
+        console.log(e.latLng);
+        refresh_markers();
+        start_marker.setMap(null);
+        start_marker = placeMarkerAndPanTo(e.latLng.lat(), e.latLng.lng(), "Start point", "green");
+        $('#search_lat').text(e.latLng.lat());
+        return $('#search_lng').text(e.latLng.lng());
+      });
+    };
+    placeMarkerAndPanTo = function(lat, lng, message, color) {
+      var latLng, marker;
+      if (color == null) {
+        color = "red";
+      }
+      latLng = new google.maps.LatLng(lat, lng);
+      marker = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        icon: 'http://maps.google.com/mapfiles/ms/icons/' + color + '-dot.png',
+        title: message,
+        label: message
+      });
+      map.panTo(latLng);
+      return marker;
+    };
+    return {
+      init: initMap,
+      add_point: add_point,
+      draw_search_result: draw_search_result
+    };
+  };
+
+  $(document).on('turbolinks:load', function() {
+    window.geo = new Geolocate();
+    $('#closest_marker').bind('click', function() {
+      return App.geo.send({
+        find_close: window.geo.start_point
+      });
+    });
+    return $('#find_markers_in_radius').bind('click', function() {
+      return App.geo.send({
+        find_in_radius: window.geo.start_point
+      });
+    });
+  });
+
+}).call(this);
+:ET

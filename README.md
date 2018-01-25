@@ -1,24 +1,50 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Simple geocache service on ROR.
+Contains two parts - API and user interface.
 
-Things you may want to cover:
+Page for user interface - http://localhost:3000/geoservice/index
+User can add geolocation with message on google map and find closest geolocations or geolocations in raduis from certain marker on map.
 
-* Ruby version
+API Requests:
 
-* System dependencies
+=> show certain geolocation
+   url: http://localhost:3000/api/show/:id
+   method: GET
 
-* Configuration
+=> list of all geolocations
+   url: http://localhost:3000/api/list
+   method: GET
 
-* Database creation
+=> create new geolocation
+  url: http://localhost:3000/api/create
+  method: Post
+  Body : json
+  params: 
+	message: string
+	lat: float
+	lng: float
 
-* Database initialization
+=> delete certain geolocation
+   url: http://localhost:3000/api/delete/:id
+   method: DELETE
+   body : not needed	
 
-* How to run the test suite
+=> update certain geolocation
+  url: http://localhost:3000/api/update/:id 
+  method: PUT
+  Body : json
+  params: 
+	message: string
+	lat: float
+	lng: float
+  
+=> find closest geolocation 
+  url: http://localhost:3000/api/closest/:lat/:lng
+  method: GET
+  body : not needed
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+=> find list of geolocations in 100 km radius
+  url: http://localhost:3000/api/in_radius/:lat/:lng
+  method: GET
+  body : not needed
